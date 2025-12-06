@@ -1,7 +1,15 @@
 # Speckle2Graph
-!["Speckle2Graph!"](/pictures/Speckle2GraphVersion4.gif "Enable Speckle 2Graph Pipeline")
+<!-- !["test"](/pictures/Speckle2GraphVersion4.gif "Enable Speckle 2Graph Pipeline") -->
+
+<img src="pictures/Speckle2GraphVersion4.gif" alt="Sample Image" width="650" height="280">
 
 # Purpose of the Library
-Beta Version.
+This is an alpha version, so any feedback of bugs is very appreciated
 
-The library aims to enrich speckle model DAG with adjacency edges between BIM elements and writes the graph to Neo4j to enable more specific topological analysis 
+The library aims to enrich the Speckle-Directed Acyclic Graph (DAG) by adding edges between BIM elements, enabling more specific graph-based analysis.
+
+Currently we support Neo4j only
+
+# Development Roadmap
+
+Will be added soon!

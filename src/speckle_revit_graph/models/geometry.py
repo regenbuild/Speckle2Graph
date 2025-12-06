@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class GeometryObject:
+class GeometryNode:
     """Represents an object that has a displayValue"""
     name: str
     id: str

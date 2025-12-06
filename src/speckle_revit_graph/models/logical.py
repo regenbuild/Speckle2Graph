@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class LogicalObject:
+class LogicalNode:
     """Represents an object that groups geometry objects"""
     id: str
     name: str
