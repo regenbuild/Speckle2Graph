@@ -6,6 +6,7 @@ from speckle2graph.utils.helpers import transform_vertices
 
 from collections import deque
 from typing import Generator, Optional
+from loguru import logger
 
 from specklepy.objects.data_objects import DataObject
 from specklepy.objects.models.collections.collection import Collection
@@ -17,10 +18,11 @@ import json
 import numpy as np
 import trimesh
 
-class TraverseSpeckleDAG:
+class TraverseRevitDAG:
     """Traverses a speckle DAG and yields logical and geometrical objects"""
     def __init__(self, speckle_root: DataObject):
         self.root = speckle_root
+        self.instanced_objects = {}
 
     def __str__(self):
         return f"{self.root.name}"
@@ -35,7 +37,7 @@ class TraverseSpeckleDAG:
 
         instanceDefinitionProxies: list[InstanceDefinitionProxy] = getattr(self.root, "instanceDefinitionProxies", [])
         instanceDefinitionProxiesMap: dict[str, list[InstanceProxy]] = {el.applicationId: el.objects for el in instanceDefinitionProxies}
-        print(f"{len(instanceDefinitionProxiesMap)} Proxies were found")
+        logger.info("{} proxies were found", len(instanceDefinitionProxiesMap))
 
         stack: deque = deque()
         stack.append(self.root)
@@ -48,7 +50,7 @@ class TraverseSpeckleDAG:
                 self.instanced_objects = {}
                 for el in head.elements:
                     self.instanced_objects[el.applicationId] = el
-                print(f"{len(self.instanced_objects)} instances were found")
+                logger.info("{} instances were found", len(self.instanced_objects))
 
             # If head is collection, iterate over it and add to stack
             elif isinstance(head, Collection) and head.id not in objects_to_skip:
@@ -63,7 +65,6 @@ class TraverseSpeckleDAG:
                                     speckleType = head.speckle_type
                                 )
                 items_yielded += 1
-                
                 yield logical_node
 
             elif isinstance(head, list):
@@ -89,12 +90,16 @@ class TraverseSpeckleDAG:
                         geometries_for_trimesh.append(obj)
 
                 try:
+                    if len(geometries_for_trimesh) == 0:
+                        logger.warning("No geometries found for {}", head.name)
+                        continue
+                    
                     trimesh_data = [trimesh.Trimesh(faces=transform_faces(mesh.faces),
                                                     vertices = transform_vertices(mesh.vertices)) for mesh in geometries_for_trimesh]
 
                     if len(trimesh_data) > 1:
                         result_mesh = trimesh.util.concatenate(a = trimesh_data[0], b = trimesh_data[1:])
-                    else:
+                    elif len(trimesh_data) == 1:
                         result_mesh = trimesh_data[0]
 
                     if len(transform_matrices) > 0:
@@ -121,12 +126,20 @@ class TraverseSpeckleDAG:
 
                 except Exception as e:
                     number_of_fails += 1
-                    print(e)
-                    print(f"{number_of_fails}, Failed to build {head.name}")
-                    self.failed_objects[head.applicationId] = head
+                    logger.error(
+                        "Failed to build {} (failure #{}): {}",
+                        head.name,
+                        number_of_fails,
+                        str(e)
+                    )
+                    failed_id = getattr(head, 'applicationId', None) or head.id
+                    self.failed_objects[failed_id] = head
         
-        print("Parsing complete:", items_yielded, "objects yielded, ", number_of_fails, "failed")
+        logger.info(
+            "Parsing complete: {} objects yielded, {} failed",
+            items_yielded,
+            number_of_fails
+        )
         
-
     def get_failed_objects(self):
         return self.failed_objects

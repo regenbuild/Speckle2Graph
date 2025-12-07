@@ -43,8 +43,6 @@ def write_geometrical_graph_to_neo4j(graph_builder_object: GraphBuilder, neo4j_c
                 )
         
     for edge in tqdm(graph_builder_object.geometrical_graph.edges(data=True), desc="Writing Geometrical Edges to Neo4j"):
-        first_node_name = graph_builder_object.geometrical_graph.nodes[edge[0]]["name"]
-        second_node_name = graph_builder_object.geometrical_graph.nodes[edge[1]]["name"]
 
         distance = edge[2]['distance']
 
@@ -52,7 +50,5 @@ def write_geometrical_graph_to_neo4j(graph_builder_object: GraphBuilder, neo4j_c
                                CREATE (n1)-[:CONNECTED_TO {name: $connect_name, distance: $distance}]->(n2)""",
                             source_id = edge[0],
                             target_id = edge[1],
-                            first_node_name = first_node_name,
-                            second_node_name = second_node_name,
                             distance = distance,
                             connect_name = edge[2]["name"])
