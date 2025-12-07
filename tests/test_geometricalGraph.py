@@ -22,7 +22,7 @@ def receive_speckle_object():
 
     return root
 
-def test_logic_graph(root):
+def test_geometric_graph(root):
     traversed_speckle_object = TraverseSpeckleDAG(root)
 
     graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object.parse_obj())
@@ -35,4 +35,4 @@ def test_logic_graph(root):
 
 root = receive_speckle_object()
 print("Testing Logical Graph Construction")
-test_logic_graph(root)
+test_geometric_graph(root)

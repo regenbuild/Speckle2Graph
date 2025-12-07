@@ -1,6 +1,5 @@
 from speckle2graph.graph_builders.simple_graph_builder import GraphBuilder
-from neo4j import GraphDatabase
-import tqdm 
+from tqdm import tqdm
 
 def write_logical_graph_to_neo4j(graph_builder_object: GraphBuilder, neo4j_client_driver):
     for node in tqdm(graph_builder_object.logical_graph.nodes(data=True), desc="Writing Nodes to Neo4j"):
@@ -26,21 +25,18 @@ def write_geometrical_graph_to_neo4j(graph_builder_object: GraphBuilder, neo4j_c
     for node in tqdm(graph_builder_object.geometrical_graph.nodes(data=True), desc="Writing Geometrical Nodes to Neo4j"):
         # print(node)
         name_for_neo4j = node[1]['name']
-        builtIn_category_for_neo4j = node[1]['builtIn_category']
-        revitId_for_neo4j = node[1]['revitId']
+        revitId_for_neo4j = node[1]['RevitId']
         centroid_for_neo4j = node[1]['centroid']
 
         neo4j_client_driver.execute_query("""UNWIND $batch AS row
                                         MATCH (n1 {id: $node_id})
                                         SET n1.name = $name_for_neo4j
-                                        SET n1.builtIn_category = $builtIn_category_for_neo4j
-                                        SET n1.revitId = $revitId_for_neo4j
+                                        SET n1.RevitId = $revitId_for_neo4j
                                         SET n1.centroid = $centroid_for_neo4j
                                         SET n1 += row
                                         """,
                                         node_id = node[0],
                                         name_for_neo4j = name_for_neo4j,
-                                        builtIn_category_for_neo4j = builtIn_category_for_neo4j,
                                         revitId_for_neo4j = revitId_for_neo4j,
                                         centroid_for_neo4j = centroid_for_neo4j,
                                         batch = node[1]['properties']

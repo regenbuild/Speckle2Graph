@@ -16,10 +16,13 @@ requires-python = ">=3.10"
 dependencies = [
     "specklepy",
     "numpy",
+    "scipy",
     "trimesh",
+    "python-fcl",
     "networkx",
     "rtree",
-    "neo4j"
+    "neo4j",
+    "tqdm"
 ]
 
 readme = "README.md"
