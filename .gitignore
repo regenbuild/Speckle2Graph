@@ -1,0 +1,15 @@
+# Environments
+.venv/
+venv/
+env/
+env
+.env
+
+# Distributions
+*.egg-info/
+
+# Compiled
+__pycache__
+*.pyc
+
+IMPROVEMENTS.md

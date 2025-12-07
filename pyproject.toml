@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Speckle2Graph"
+version = "0.0.1"
+description = "Enable graph-based analysis of any Speckle model."
+authors = [
+    { name = "Arsy", email = "arseneyworking@gmail.com" },
+]
+
+license = {text = "Apache"}
+
+requires-python = ">=3.10"
+dependencies = [
+    "specklepy>=3.1.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "trimesh>=4.0.0",
+    "python-fcl>=0.7.0",
+    "networkx>=3.0",
+    "rtree>=1.0.0",
+    "neo4j>=5.0.0",
+    "tqdm>=4.65.0",
+    "loguru>=0.7.0"
+]
+
+readme = "README.md"

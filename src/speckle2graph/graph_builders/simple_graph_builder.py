@@ -1,0 +1,98 @@
+import networkx as nx
+from rtree import index
+from tqdm import tqdm
+from loguru import logger
+
+from speckle2graph.models import LogicalNode
+from speckle2graph.models import GeometryNode
+from speckle2graph.utils.helpers import flatten_dictionary
+
+import json
+import numpy as np
+
+class GraphBuilder:
+    def __init__(self, traversed_speckle_object):
+        self.traversed_speckle_object = traversed_speckle_object
+        self.logical_objects = {}
+        self.geometrical_objects = {}
+        self.logical_graph = nx.DiGraph()
+        self.geometrical_graph = nx.DiGraph()
+
+        p = index.Property()
+        p.dimension = 3
+        self.spatial_index = index.Index(properties=p)
+    
+    def separate_logical_and_geometrical_objects(self):
+        for speckle_object in self.traversed_speckle_object:
+            if isinstance(speckle_object, LogicalNode):
+                self.logical_objects[speckle_object.id] = speckle_object
+            elif isinstance(speckle_object, GeometryNode):
+                self.geometrical_objects[speckle_object.id] = speckle_object
+
+    def build_logical_graph(self, edge_type="CONTAINS"):
+        for key, value in self.logical_objects.items():
+            for contained_element in value.containedElementsIds:
+                self.logical_graph.add_node(contained_element, id=contained_element)
+                self.logical_graph.add_edge(key, contained_element, name=edge_type)
+
+        logger.info(
+            "Logical graph built: {} nodes, {} edges",
+            self.logical_graph.number_of_nodes(),
+            self.logical_graph.number_of_edges()
+        )
+
+    def _build_geometries_index(self):
+        for i, obj in enumerate(self.geometrical_objects.values()):
+            self.spatial_index.insert(i, obj.bounding_box, obj=obj.id)
+
+    def _find_intersection_pairs(self):
+        from trimesh.collision import CollisionManager
+        intersection_pairs = set()
+
+        self._build_geometries_index()
+
+        for element in tqdm(self.geometrical_objects.values(), desc="Finding intersecting geometries"):
+            for intersection in self.spatial_index.intersection(element.bounding_box, objects=True):
+                if element.id != intersection.object:
+                    collisionManager = CollisionManager()
+                    collisionManager.add_object(name = element.id, mesh = element.geometry)
+                    collisionManager.add_object(name = intersection.object, mesh = self.geometrical_objects[intersection.object].geometry)
+                    result = collisionManager.in_collision_internal(return_names=True)
+                    if result[0]:
+                        intersection_pairs.add(tuple(*result[1]))
+
+        return intersection_pairs
+
+    
+    def build_geometrical_graph(self, edge_type="CONNECTED_TO"):
+        for obj in self.geometrical_objects.values():
+            try:
+                node_properties = json.loads(obj.properties)
+            except json.JSONDecodeError as e:
+                logger.error("Failed to parse properties for {}: {}", obj.name, e)
+                continue
+            
+            properties = flatten_dictionary(node_properties)
+    
+    
+            self.geometrical_graph.add_node(obj.id,
+                                            name = obj.name,
+                                            RevitId = node_properties['elementId'],
+                                            properties = properties,
+                                            centroid = obj.centroid
+                                        )
+            
+        intersection_pairs = self._find_intersection_pairs()
+
+        for pair in intersection_pairs:
+            first_centroid = self.geometrical_objects[pair[0]].centroid
+            second_centroid = self.geometrical_objects[pair[1]].centroid
+            centroid_based_distance = np.linalg.norm(second_centroid - first_centroid)
+    
+            self.geometrical_graph.add_edge(pair[0], pair[1], name = edge_type, distance = centroid_based_distance)
+
+        logger.info(
+            "Geometrical graph built: {} nodes, {} edges",
+            self.geometrical_graph.number_of_nodes(),
+            self.geometrical_graph.number_of_edges()
+        )
