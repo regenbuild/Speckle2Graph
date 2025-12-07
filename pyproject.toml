@@ -22,7 +22,8 @@ dependencies = [
     "networkx>=3.0",
     "rtree>=1.0.0",
     "neo4j>=5.0.0",
-    "tqdm>=4.65.0"
+    "tqdm>=4.65.0",
+    "loguru>=0.7.0"
 ]
 
 readme = "README.md"

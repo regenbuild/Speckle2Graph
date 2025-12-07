@@ -1,6 +1,7 @@
 import networkx as nx
 from rtree import index
 from tqdm import tqdm
+from loguru import logger
 
 from speckle2graph.models import LogicalNode
 from speckle2graph.models import GeometryNode
@@ -30,10 +31,15 @@ class GraphBuilder:
 
     def build_logical_graph(self, edge_type="CONTAINS"):
         for key, value in self.logical_objects.items():
-
             for contained_element in value.containedElementsIds:
                 self.logical_graph.add_node(contained_element, id=contained_element)
                 self.logical_graph.add_edge(key, contained_element, name=edge_type)
+
+        logger.info(
+            "Logical graph built: {} nodes, {} edges",
+            self.logical_graph.number_of_nodes(),
+            self.logical_graph.number_of_edges()
+        )
 
     def _build_geometries_index(self):
         for i, obj in enumerate(self.geometrical_objects.values()):
@@ -60,7 +66,12 @@ class GraphBuilder:
     
     def build_geometrical_graph(self, edge_type="CONNECTED_TO"):
         for obj in self.geometrical_objects.values():
-            node_properties = json.loads(obj.properties)
+            try:
+                node_properties = json.loads(obj.properties)
+            except json.JSONDecodeError as e:
+                logger.error("Failed to parse properties for {}: {}", obj.name, e)
+                continue
+            
             properties = flatten_dictionary(node_properties)
     
     
@@ -80,4 +91,8 @@ class GraphBuilder:
     
             self.geometrical_graph.add_edge(pair[0], pair[1], name = edge_type, distance = centroid_based_distance)
 
-        print(self.geometrical_graph)
+        logger.info(
+            "Geometrical graph built: {} nodes, {} edges",
+            self.geometrical_graph.number_of_nodes(),
+            self.geometrical_graph.number_of_edges()
+        )

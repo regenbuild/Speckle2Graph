@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Union
+import numpy as np
 
 @dataclass
 class GeometryNode:
@@ -7,7 +9,7 @@ class GeometryNode:
     id: str
     speckleType: str
     geometry: list | None
-    centroid: tuple[int]
+    centroid: Union[tuple[float, float, float], np.ndarray]
     raw_vertices: str
     raw_faces: str
     bounding_box: list

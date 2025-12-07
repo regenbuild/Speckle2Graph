@@ -1,4 +1,4 @@
-from speckle2graph.parsers.traverseDAG import TraverseSpeckleDAG
+from speckle2graph.traversers.traverse_revit_dag import TraverseRevitDAG
 from speckle2graph.graph_builders.simple_graph_builder import GraphBuilder
 from speckle2graph.models.geometry import GeometryNode
 from speckle2graph.models.logical import LogicalNode
@@ -9,7 +9,7 @@ from speckle2graph.neo4j_queries.basic_query import (
 
 __version__ = "0.0.1"
 __all__ = [
-    "TraverseSpeckleDAG",
+    "TraverseRevitDAG",
     "GraphBuilder",
     "GeometryNode",
     "LogicalNode",
