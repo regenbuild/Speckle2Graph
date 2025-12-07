@@ -11,3 +11,5 @@ env
 # Compiled
 __pycache__
 *.pyc
+
+IMPROVEMENTS.md
