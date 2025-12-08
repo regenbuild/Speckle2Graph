@@ -28,7 +28,7 @@ class TraverseRevitDAG:
         return f"{self.root.name}"
 
 
-    def parse_obj(self, objects_to_skip: list = [], show_progress: bool = True) -> Generator[LogicalNode | GeometryNode]:
+    def parse_obj(self, objects_to_skip: list = [], show_progress: bool = True) -> Generator[LogicalNode | GeometryNode, None, None]:
     
         self.failed_objects: dict[str, DataObject] = {}
 
