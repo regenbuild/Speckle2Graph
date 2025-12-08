@@ -27,8 +27,8 @@ def test_geometric_graph(root):
     graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object)
     graph_builder.build_geometrical_graph()
 
-    print("Logical Objects Parsed: ", len(graph_builder.logical_objects))
-    print("Geometrical Objects Parsed: ", len(graph_builder.geometrical_objects))
+    print("Logical Objects Parsed: ", len(graph_builder._logical_objects))
+    print("Geometrical Objects Parsed: ", len(graph_builder._geometrical_objects))
     print(graph_builder.geometrical_graph)
 
 root = receive_speckle_object()
