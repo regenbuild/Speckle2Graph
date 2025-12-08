@@ -25,8 +25,7 @@ def receive_speckle_object():
 def test_logic_graph(root):
     traversed_speckle_object = TraverseRevitDAG(root)
 
-    graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object.parse_obj())
-    graph_builder.separate_logical_and_geometrical_objects()
+    graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object)
     graph_builder.build_logical_graph()
 
     print("Logical Objects Parsed: ", len(graph_builder.logical_objects))

@@ -22,13 +22,12 @@ def receive_speckle_object():
 def test_traverse(root):
     from speckle2graph import TraverseRevitDAG
 
-    traversed_speckle_object = TraverseRevitDAG(root).parse_obj()
+    traversed_speckle_object = TraverseRevitDAG(root)
 
     return traversed_speckle_object
 
 root  = receive_speckle_object()
 result = test_traverse(root)
 
-result_list = [i.name for i in result]
-
-print(result_list)
+for obj in result:
+    print(obj)
