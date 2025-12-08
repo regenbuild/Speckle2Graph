@@ -5,7 +5,7 @@ from speckle2graph.utils.helpers import transform_faces
 from speckle2graph.utils.helpers import transform_vertices
 
 from collections import deque
-from typing import Generator, Optional
+from typing import Generator
 from loguru import logger
 
 from specklepy.objects.data_objects import DataObject
@@ -20,15 +20,15 @@ import trimesh
 
 class TraverseRevitDAG:
     """Traverses a speckle DAG and yields logical and geometrical objects"""
-    def __init__(self, speckle_root: DataObject):
+    def __init__(self, speckle_root: DataObject, objects_to_skip: list[str] = []):
         self.root = speckle_root
         self.instanced_objects = {}
+        self.flattened_speckle_dag = self.traverse_dag(objects_to_skip=objects_to_skip) 
 
     def __str__(self):
         return f"{self.root.name}"
 
-
-    def parse_obj(self, objects_to_skip: list = [], show_progress: bool = True) -> Generator[LogicalNode | GeometryNode, None, None]:
+    def traverse_dag(self, objects_to_skip: list = []) -> Generator[LogicalNode | GeometryNode, None, None]:
     
         self.failed_objects: dict[str, DataObject] = {}
 

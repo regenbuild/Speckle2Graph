@@ -22,7 +22,7 @@ class GraphBuilder:
         p.dimension = 3
         self.spatial_index = index.Index(properties=p)
     
-    def separate_logical_and_geometrical_objects(self):
+    def _separate_logical_and_geometrical_objects(self):
         for speckle_object in self.traversed_speckle_object:
             if isinstance(speckle_object, LogicalNode):
                 self.logical_objects[speckle_object.id] = speckle_object
@@ -30,6 +30,9 @@ class GraphBuilder:
                 self.geometrical_objects[speckle_object.id] = speckle_object
 
     def build_logical_graph(self, edge_type="CONTAINS"):
+        if self.logical_objects == {} or self.geometrical_objects == {}:
+            self._separate_logical_and_geometrical_objects()
+
         for key, value in self.logical_objects.items():
             for contained_element in value.containedElementsIds:
                 self.logical_graph.add_node(contained_element, id=contained_element)
@@ -65,6 +68,9 @@ class GraphBuilder:
 
     
     def build_geometrical_graph(self, edge_type="CONNECTED_TO"):
+        if self.logical_objects == {} or self.geometrical_objects == {}:
+            self._separate_logical_and_geometrical_objects()
+
         for obj in self.geometrical_objects.values():
             try:
                 node_properties = json.loads(obj.properties)
@@ -73,7 +79,6 @@ class GraphBuilder:
                 continue
             
             properties = flatten_dictionary(node_properties)
-    
     
             self.geometrical_graph.add_node(obj.id,
                                             name = obj.name,
