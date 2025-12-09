@@ -39,21 +39,14 @@ graph_biulder.build_geometrical_graph()
 from speckle2graph import write_logical_graph_to_neo4j
 from speckle2graph import write_geometrical_graph_to_neo4j 
 from speckle2graph import assign_labels_to_geometrical_graph_to_neo4j
+from neo4j import GraphDatabase
 
-# Authorize to Neo4j
-load_dotenv()
-neo4j_password = os.getenv("NEO4J_PASSWORD")
-neo4j_username = os.getenv("NEO4J_USERNAME")
-auth = (neo4j_username, neo4j_password)
-URI = os.getenv("NEO4J_URI")
-
-# Write the graph to Neo4j for further analysis. 
+# Authorize and write the graph to Neo4j for further analysis. 
 with GraphDatabase.driver(URI, auth=auth) as driver:
     driver.verify_connectivity()
     write_logical_graph_to_neo4j(graph_builder_object, driver)
     write_geometrical_graph_to_neo4j(graph_builder_object, driver)
     assign_labels_to_geometrical_graph_to_neo4j(graph_builder_object, driver)
-
 ```
 
 # Development Roadmap
