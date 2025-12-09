@@ -25,13 +25,15 @@ def receive_speckle_object():
 def test_logic_graph(root):
     traversed_speckle_object = TraverseRevitDAG(root)
 
-    graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object)
-    graph_builder.build_logical_graph()
+    logical_graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object)
+    logical_graph_builder.build_logical_graph()
 
-    print("Logical Objects Parsed: ", len(graph_builder._logical_objects))
-    print("Geometrical Objects Parsed: ", len(graph_builder._geometrical_objects))
-    print(graph_builder.logical_graph)
+    # print("Logical Objects Parsed: ", len(graph_builder._logical_objects))
+    # print("Geometrical Objects Parsed: ", len(graph_builder._geometrical_objects))
+    print(logical_graph_builder.logical_graph)
+
+    return logical_graph_builder
 
 root = receive_speckle_object()
 print("Testing Logical Graph Construction")
-test_logic_graph(root)
+logic_graph = test_logic_graph(root)

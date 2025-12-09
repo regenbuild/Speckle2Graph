@@ -4,7 +4,8 @@ from speckle2graph.models.geometry import GeometryNode
 from speckle2graph.models.logical import LogicalNode
 from speckle2graph.neo4j_queries.basic_query import (
     write_logical_graph_to_neo4j,
-    write_geometrical_graph_to_neo4j
+    write_geometrical_graph_to_neo4j,
+    assign_labels_to_geometrical_graph_to_neo4j,
 )
 
 __version__ = "0.0.1"

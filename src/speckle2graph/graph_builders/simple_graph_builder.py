@@ -36,6 +36,8 @@ class GraphBuilder:
             self._separate_logical_and_geometrical_objects()
 
         for key, value in self._logical_objects.items():
+            self.logical_graph.add_node(key, name=value.name, id=value.id, speckle_type=value.speckleType)
+
             for contained_element in value.containedElementsIds:
                 self.logical_graph.add_node(contained_element, id=contained_element)
                 self.logical_graph.add_edge(key, contained_element, name=edge_type)

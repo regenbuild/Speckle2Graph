@@ -1,6 +1,6 @@
 from speckle2graph import GraphBuilder
 from speckle2graph import TraverseRevitDAG
-from speckle2graph import write_logical_graph_to_neo4j, write_geometrical_graph_to_neo4j
+from speckle2graph import write_logical_graph_to_neo4j, write_geometrical_graph_to_neo4j, assign_labels_to_geometrical_graph_to_neo4j
 
 from neo4j import GraphDatabase
 from specklepy.api.client import SpeckleClient
@@ -61,9 +61,21 @@ def test_write_geometrical_graph_to_neo4j(graph_builder_object: GraphBuilder):
         driver.verify_connectivity()
         write_geometrical_graph_to_neo4j(graph_builder_object, driver)
 
+def test_assign_labels_to_geometrical_graph_to_neo4j(graph_builder_object: GraphBuilder):
+    load_dotenv()
+    neo4j_password = os.getenv("NEO4J_PASSWORD")
+    neo4j_username = os.getenv("NEO4J_USERNAME")
+    auth = (neo4j_username, neo4j_password)
+    URI = os.getenv("NEO4J_URI")
+    
+    with GraphDatabase.driver(URI, auth=auth) as driver:
+        driver.verify_connectivity()
+        assign_labels_to_geometrical_graph_to_neo4j(graph_builder_object, driver)
+
 root = receive_speckle_object()
-logical_graph_builder_object = build_logic_graph(root)
+# logical_graph_builder_object = build_logic_graph(root)
 geometrical_graph_builder_object = build_geometric_graph(root)
 
-test_write_logical_graph_to_neo4j(graph_builder_object=logical_graph_builder_object)
+# test_write_logical_graph_to_neo4j(graph_builder_object=logical_graph_builder_object)
 test_write_geometrical_graph_to_neo4j(graph_builder_object=geometrical_graph_builder_object)
+test_assign_labels_to_geometrical_graph_to_neo4j(graph_builder_object=geometrical_graph_builder_object)
