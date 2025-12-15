@@ -83,9 +83,8 @@ def test_logical_and_geometrical_graph_writing():
         driver.verify_connectivity()
         
         neo4j_client_wrapper = Neo4jClientDriverWrapper(driver=driver, graph_builder_object=full_graph_builder_object)
-        # write_geometrical_graph_to_neo4j(graph_builder_object, driver)
-        Neo4jClientDriverWrapper.write_geometrical_graph_to_neo4j(neo4j_client_wrapper)
-        Neo4jClientDriverWrapper.write_logical_graph_to_neo4j(neo4j_client_wrapper)
+        neo4j_client_wrapper.write_geometrical_graph_to_neo4j(neo4j_client_wrapper)
+        neo4j_client_wrapper.write_logical_graph_to_neo4j(neo4j_client_wrapper)
         
 # root = receive_speckle_object()
 # logical_graph_builder_object = build_logic_graph(root)

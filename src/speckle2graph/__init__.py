@@ -5,7 +5,7 @@ from speckle2graph.models.logical import LogicalNode
 from speckle2graph.neo4j_queries.basic_queries import Neo4jClientDriverWrapper
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __all__ = [
     "TraverseRevitDAG",
     "GraphBuilder",
