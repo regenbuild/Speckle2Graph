@@ -1,7 +1,6 @@
 # Speckle2Graph
-<!-- !["test"](/pictures/Speckle2GraphVersion4.gif "Enable Speckle 2Graph Pipeline") -->
-
-<img src="pictures/Speckle2GraphVersion4.gif" alt="Sample Image" width="650" height="400">
+!["test"](/static/Speckle2GraphVersion6.gif "Enable Speckle to Graph Pipeline")
+<!-- <img src="static/Speckle2GraphVersion5.gif" alt="Sample Image" width="650" height="400"> -->
 
 # Purpose of the Library
 This is an alpha version, so any feedback of bugs is very appreciated
@@ -17,7 +16,7 @@ Currently we support Neo4j only
 # Usage
 ```python
 # Install the library (PYPI will be added soon)
-!pip install git+https://github.com/2twenity/Speckle2Graph.git
+!pip install speckle2graph
 ```
 
 ```python
@@ -31,15 +30,14 @@ root = operations.receive(ROOT, remote_transport = transport)
 ```
 
 ```python
-# Build a Graph in 4 lines of code
+# Build a Graph in 3 lines of code
 traversed_object = TraverseRevitDAG(root)
 graph_builder = GraphBuilder(traversed_speckle_object=traversed_object)
-graph_builder.build_logical_graph()
-graph_builder.build_geometrical_graph()
+graph_builder.build()
 ```
 
 ```python
-# Some predefined quries could be imported
+# Write the graph to a neo4j database
 from speckle2graph import Neo4jClientDriverWrapper
 from neo4j import GraphDatabase
 
@@ -48,10 +46,9 @@ with GraphDatabase.driver(URI, auth=auth) as driver:
     driver.verify_connectivity()
     neo4j_client_wrapper = Neo4jClientDriverWrapper(
         driver=driver,
-        graph_builder_object=full_graph_builder_object
+        graph_builder_object=graph_builder
     )
-    neo4j_client_wrapper.write_geometrical_graph_to_neo4j(neo4j_client_wrapper)
-    neo4j_client_wrapper.write_logical_graph_to_neo4j(neo4j_client_wrapper)
+    neo4j_client_wrapper.write_graph()
 ```
 
 # Development Roadmap

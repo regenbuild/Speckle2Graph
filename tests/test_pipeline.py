@@ -1,3 +1,4 @@
+from speckle2graph import GraphPipeline
 from speckle2graph import GraphBuilder
 from speckle2graph import TraverseRevitDAG
 from speckle2graph import Neo4jClientDriverWrapper
@@ -23,28 +24,23 @@ def receive_speckle_object():
 
     return root
 
-def build_graph(root):
-    traversed_speckle_object = TraverseRevitDAG(root)
-
-    graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object)
-    graph_builder.build_graph()
-
-    return graph_builder
-
-def test_graph_writing():
-    root = receive_speckle_object()
-    graph_builder_object = build_graph(root)
-
+def authorize_neo4j():
+    load_dotenv()
     neo4j_password = os.getenv("NEO4J_PASSWORD")
     neo4j_username = os.getenv("NEO4J_USERNAME")
     auth = (neo4j_username, neo4j_password)
     URI = os.getenv("NEO4J_URI")
-    
-    with GraphDatabase.driver(URI, auth=auth) as driver:
-        driver.verify_connectivity()
-        
-        neo4j_client_wrapper = Neo4jClientDriverWrapper(driver=driver, graph_builder_object=graph_builder_object)
-        neo4j_client_wrapper.write_graph()
-        
+    return (URI, auth)
 
-test_graph_writing()
+# def test_pipeline():
+#     speckle_root = receive_speckle_object()
+#     model_loader = TraverseRevitDAG(speckle_root=speckle_root)
+#     graph_builder = GraphBuilder()
+#     graph_exporter = Neo4jClientDriverWrapper(authorize_neo4j())
+
+#     graph_pipeline = GraphPipeline(
+#         model_loader = model_loader,
+#         graph_builder = graph_builder,
+#         graph_exporter = graph_exporter
+#     )
+#     graph_pipeline.run()

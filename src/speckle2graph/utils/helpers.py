@@ -40,7 +40,7 @@ def transform_vertices(speckle_vertices: list[float]) -> list[list[float]]:
 
     return trimesh_vertices # Nested list like [[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]
 
-def label_specific_queriy_maker(input_category: str) -> str:
+def label_specific_query_maker(input_category: str) -> str:
     """A function to assign a node label. In the future would be used to apply semantics from a certain ontology"""
 
     labels_to_query_mapping = {

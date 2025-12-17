@@ -22,7 +22,7 @@ class TraverseRevitDAG:
     """Traverses a speckle DAG and yields logical and geometrical objects"""
     def __init__(self, speckle_root: DataObject, objects_to_skip: list[str] = []):
         self.root = speckle_root
-        self.instanced_objects = {}
+        self.instanced_objects: dict[str, LogicalNode|GeometryNode] = {}
         self.flattened_speckle_dag = self._traverse_dag(objects_to_skip=objects_to_skip) 
 
     def __str__(self):
@@ -31,7 +31,7 @@ class TraverseRevitDAG:
     def __iter__(self):
         return iter(self.flattened_speckle_dag)
 
-    def _traverse_dag(self, objects_to_skip: list = []) -> Generator[LogicalNode | GeometryNode, None, None]:
+    def _traverse_dag(self, objects_to_skip: list = []) -> Generator[LogicalNode|GeometryNode, None, None]:
     
         self.failed_objects: dict[str, DataObject] = {}
 

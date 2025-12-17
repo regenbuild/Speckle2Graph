@@ -22,10 +22,6 @@ class GraphBuilder:
         p = index.Property()
         p.dimension = 3
         self._spatial_index = index.Index(properties=p)
-
-        self._logical_graoh_written_to_neo4j = False
-        self._geometrical_graph_written_to_neo4j = False
-        self._geometrical_to_logical_mapping_written_to_neo4j = False
     
     def _separate_logical_and_geometrical_objects(self):
         for speckle_object in self._traversed_speckle_object:
@@ -34,7 +30,7 @@ class GraphBuilder:
             elif isinstance(speckle_object, GeometryNode):
                 self._geometrical_objects[speckle_object.id] = speckle_object
 
-    def build_logical_graph(self, edge_type="CONTAINS"):
+    def _build_logical_graph(self, edge_type="CONTAINS"):
         
         if self._logical_objects == {}:
             logger.info("Calling a method to separate logical and geometrical elements")
@@ -87,7 +83,7 @@ class GraphBuilder:
         return intersection_pairs
 
     
-    def build_geometrical_graph(self, edge_type="CONNECTED_TO", precision: float = 0.05):
+    def _build_geometrical_graph(self, edge_type="CONNECTED_TO", precision: float = 0.05):
         if len(self._geometrical_objects) == 0:
             self._separate_logical_and_geometrical_objects()
 
@@ -123,6 +119,12 @@ class GraphBuilder:
             self.geometrical_graph.number_of_nodes(),
             self.geometrical_graph.number_of_edges()
         )
+
+    def build_graph(self, build_geometrical_graph: bool = True, build_logical_graph: bool = True):
+        if build_geometrical_graph:
+            self._build_geometrical_graph()
+        if build_logical_graph:
+            self._build_logical_graph()
 
     def get_geometries(self):
         return [i for i in self._geometrical_objects.values()]
