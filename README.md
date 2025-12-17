@@ -2,21 +2,34 @@
 !["test"](/static/Speckle2GraphVersion6.gif "Enable Speckle to Graph Pipeline")
 <!-- <img src="static/Speckle2GraphVersion5.gif" alt="Sample Image" width="650" height="400"> -->
 
+**⚠️ Currently in alpha - bug reports and feedback are appreciated!**
+
 # Purpose of the Library
-This is an alpha version, so any feedback of bugs is very appreciated
+speckle2graph is a framework for establishing pipelines from BIM models to graph databases with just a few lines of code.
 
-The library aims to enrich the Speckle-Directed Acyclic Graph (DAG) by adding edges between BIM elements, enabling more specific graph-based analysis.
+The semantics of a BIM model are locked within the modelling software, which creates a bottleneck for implementing AI agents that truly understand the model. Converting a BIM model to a knowledge graph with a custom ontology is an ideal foundation for building AI-driven applications.
 
-Currently we support Neo4j only
+Currently we support Neo4j only.
+
+# Key Features
+- Convert BIM models to Neo4j graph databases in 3 lines of code
+- Support for Revit models via Speckle
+- Preserves model relationships and hierarchies
+- Extensible for custom ontologies
+
+# What Gets Created
+The library traverses your Speckle BIM model and creates:
+- **Nodes**: Representing BIM elements with their properties
+- **Relationships**: Spatial and hierarchical connections between elements
+- **Graph structure**: Ready for AI agents, path-finding, and semantic queries
 
 # Prerequisites
 - Ensure that the Speckle models were uploaded using the **latest versions of the connectors**.
-- Ensure that your Neo4j instance has the **APOC plugin** installed. Since Cypher queries are used to insert data and they don't support dynamic labels from parameters, we are forced to use APOC to save time on writing label-assigning queries manually.
 
 # Usage
 ```python
-# Install the library (PYPI will be added soon)
-!pip install speckle2graph
+# Install the library
+pip install speckle2graph
 ```
 
 ```python
@@ -25,7 +38,7 @@ client = SpeckleClient()
 client.authenticate_with_token(SPECKLE_TOKEN)
 transport = ServerTransport(PROJECT_ID, client)
 
-# Make sure you paste the root of the speckle model, otherwise, the geometries will fail to build.
+# Receive the root object from Speckle (must be the model root for geometry to build correctly)
 root = operations.receive(ROOT, remote_transport = transport) 
 ```
 
@@ -51,6 +64,5 @@ with GraphDatabase.driver(URI, auth=auth) as driver:
     neo4j_client_wrapper.write_graph()
 ```
 
-# Development Roadmap
-
-Will be added soon!
+# Example
+!["test"](/static/BIM2Graph.png "Models example")
