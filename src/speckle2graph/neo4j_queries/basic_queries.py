@@ -1,12 +1,13 @@
 from speckle2graph.graph_builders.simple_graph_builder import GraphBuilder
-from speckle2graph.utils.helpers import label_specific_query_maker
-
+# from speckle2graph.utils.helpers import label_specific_query_maker
+from .label_makers import Neo4jRevitLabelAssigner, Neo4jIfcLabelAssigner
 from tqdm import tqdm
 
 class Neo4jClientDriverWrapper:
-    def __init__(self, driver, graph_builder_object: GraphBuilder):
+    def __init__(self, driver, graph_builder_object: GraphBuilder, label_assigner = Neo4jRevitLabelAssigner):
         self.neo4j_client_driver = driver
         self.graph_builder_object: GraphBuilder = graph_builder_object
+        self.label_assigner = label_assigner()
         # self.logical_graph_written_status = False
         # self.geometrical_graph_written_status = False
         # self.mapping_written_status = False
@@ -89,7 +90,6 @@ class Neo4jClientDriverWrapper:
             node_for_writing = {
                 "id": node[0],
                 "name": node[1]['name'],
-                "RevitId": node[1]['RevitId'],
                 "centroid": node[1]['centroid'],
                 "category": node[1]['category'],
                 "speckle_type": node[1]['speckle_type'],
@@ -114,8 +114,8 @@ class Neo4jClientDriverWrapper:
             for i in tqdm(range(0, len(value), batch_size), desc=f"Writing {key} Nodes Batches to Neo4j"):
                 batch = value[i:i + batch_size]
                 first_string_part = "UNWIND $batch as node_data MERGE (n:"
-                second_string_part = f"{label_specific_query_maker(key)}"
-                third_string_part = " {id: node_data.id, name: node_data.name, RevitId: node_data.RevitId, centroid: node_data.centroid, category: node_data.category} ) SET n += node_data.properties;"
+                second_string_part = f"{self.label_assigner.assign_label(key)}"
+                third_string_part = " {id: node_data.id, name: node_data.name, centroid: node_data.centroid, category: node_data.category} ) SET n += node_data.properties;"
                 query_string = first_string_part + second_string_part + third_string_part
                 self.neo4j_client_driver.execute_query(query_string, batch = batch)
 

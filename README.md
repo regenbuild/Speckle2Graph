@@ -30,6 +30,9 @@ The library traverses your Speckle BIM model and creates:
 ```python
 # Install the library
 pip install speckle2graph
+
+# To follow latest developments install it from the github
+pip install git+https://github.com/2twenity/Speckle2Graph.git
 ```
 
 ```python

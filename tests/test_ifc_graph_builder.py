@@ -1,7 +1,5 @@
 from speckle2graph import GraphBuilder
-from speckle2graph import TraverseRevitDAG
-
-
+from speckle2graph import TraverseIFCDAG
 from specklepy.api.client import SpeckleClient
 from specklepy.transports.server import ServerTransport
 from specklepy.api import operations
@@ -13,8 +11,8 @@ def receive_speckle_object():
 
     load_dotenv()
     speckle_token = os.getenv("SPECKLE_TOKEN")
-    PROJECT_ID = os.getenv("PROJECT_ID")
-    ROOT = os.getenv("ROOT")
+    PROJECT_ID = os.getenv("IFC_PROJECT_ID")
+    ROOT = os.getenv("IFC_ROOT")
 
     client = SpeckleClient()
     client.authenticate_with_token(speckle_token)
@@ -25,7 +23,7 @@ def receive_speckle_object():
 
 
 def test_graph_builder(root):
-    traversed_speckle_object = TraverseRevitDAG(root)
+    traversed_speckle_object = TraverseIFCDAG(root)
 
     graph_builder = GraphBuilder(traversed_speckle_object=traversed_speckle_object)
     graph_builder.build_graph()

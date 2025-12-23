@@ -1,9 +1,9 @@
 import networkx as nx
 from rtree import index
 from tqdm import tqdm
-from loguru import logger
+# from loguru import logger
 
-from speckle2graph import TraverseRevitDAG
+from speckle2graph import TraverseRevitDAG, TraverseIFCDAG
 from speckle2graph.models import LogicalNode
 from speckle2graph.models import GeometryNode
 from speckle2graph.utils.helpers import flatten_dictionary
@@ -13,7 +13,7 @@ import numpy as np
 
 class GraphBuilder:
     def __init__(self, traversed_speckle_object):
-        self._traversed_speckle_object: TraverseRevitDAG = traversed_speckle_object
+        self._traversed_speckle_object: TraverseRevitDAG | TraverseIFCDAG = traversed_speckle_object
         self._logical_objects: dict = {}
         self._geometrical_objects: dict = {}
         self.logical_graph = nx.DiGraph()
@@ -33,7 +33,7 @@ class GraphBuilder:
     def _build_logical_graph(self, edge_type="CONTAINS"):
         
         if self._logical_objects == {}:
-            logger.info("Calling a method to separate logical and geometrical elements")
+            # logger.info("Calling a method to separate logical and geometrical elements")
             self._separate_logical_and_geometrical_objects()
 
         for key, value in self._logical_objects.items():
@@ -50,11 +50,12 @@ class GraphBuilder:
             if first_node['logical_write_status'] and second_node['logical_write_status']:
                 edge[2]['logical_write_status'] = True
 
-        logger.info(
-            "Logical graph built: {} nodes, {} edges",
-            self.logical_graph.number_of_nodes(),
-            self.logical_graph.number_of_edges()
-        )
+        # logger.info(
+        #     "Logical graph built: {} nodes, {} edges",
+        #     self.logical_graph.number_of_nodes(),
+        #     self.logical_graph.number_of_edges()
+        # )
+        print(f"Logical graph built: {self.logical_graph.number_of_nodes()} nodes, {self.logical_graph.number_of_edges()} edges")
 
     def _build_geometries_index(self):
         for i, obj in enumerate(self._geometrical_objects.values()):
@@ -91,7 +92,8 @@ class GraphBuilder:
             try:
                 node_properties = json.loads(obj.properties)
             except json.JSONDecodeError as e:
-                logger.error("Failed to parse properties for {}: {}", obj.name, e)
+                # logger.error("Failed to parse properties for {}: {}", obj.name, e)
+                print(f"Failed to parse properties for {obj.name}: {e}")
                 continue
             
             properties = flatten_dictionary(node_properties)
@@ -100,9 +102,10 @@ class GraphBuilder:
                                             name = obj.name,
                                             category = obj.category,
                                             speckle_type = obj.speckle_type,
-                                            RevitId = node_properties['elementId'],
                                             properties = properties,
-                                            centroid = obj.centroid
+                                            centroid = obj.centroid,
+                                            raw_faces = str(obj.raw_faces),
+                                            raw_vertices = str(obj.raw_vertices)
                                         )
             
         intersection_pairs = self._find_intersection_pairs(precision=precision)
@@ -114,11 +117,14 @@ class GraphBuilder:
     
             self.geometrical_graph.add_edge(pair[0], pair[1], name = edge_type, distance = centroid_based_distance)
 
-        logger.info(
-            "Geometrical graph built: {} nodes, {} edges",
+        # logger.info(
+        #     "Geometrical graph built: {} nodes, {} edges",
+        #     self.geometrical_graph.number_of_nodes(),
+        #     self.geometrical_graph.number_of_edges()
+        # )
+        print("Geometrical graph built: {} nodes, {} edges",
             self.geometrical_graph.number_of_nodes(),
-            self.geometrical_graph.number_of_edges()
-        )
+            self.geometrical_graph.number_of_edges())
 
     def build_graph(self, build_geometrical_graph: bool = True, build_logical_graph: bool = True):
         if build_geometrical_graph:
