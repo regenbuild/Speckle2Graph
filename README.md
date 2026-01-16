@@ -54,6 +54,7 @@ graph_builder.build()
 
 ```python
 # Write the graph to a neo4j database
+from speckle2graph import Neo4jRevitLabelAssigner
 from speckle2graph import Neo4jClientDriverWrapper
 from neo4j import GraphDatabase
 
@@ -62,7 +63,8 @@ with GraphDatabase.driver(URI, auth=auth) as driver:
     driver.verify_connectivity()
     neo4j_client_wrapper = Neo4jClientDriverWrapper(
         driver=driver,
-        graph_builder_object=graph_builder
+        graph_builder_object=graph_builder,
+        label_assigner=Neo4jRevitLabelAssigner()
     )
     neo4j_client_wrapper.write_graph()
 ```
